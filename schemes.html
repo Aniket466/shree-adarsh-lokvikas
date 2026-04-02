@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>योजना - श्री आदर्श लोकविकास</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Marathi:ital@0;1&family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple: #7B2D9B;
+  --purple-dark: #4a1564;
+  --red: #E30613;
+  --yellow: #F7C800;
+  --text: #1a0a26;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  position: relative;
+  overflow-x: hidden;
+  min-height: 100vh;
+  background: #FAF7FD;
+}
+
+/* AI Moving Background */
+#bg-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -2;
+  pointer-events: none;
+}
+
+#mouse-glow {
+  position: fixed;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(247,200,0,0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+.notice-bar {
+  background: var(--yellow);
+  padding: 12px 20px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--purple-dark);
+  font-size: 14.5px;
+  z-index: 10;
+  position: relative;
+}
+
+header {
+  background: var(--purple-dark);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.35);
+}
+
+.top-bar {
+  background: #5f1a80;
+  padding: 9px 20px;
+  font-size: 13px;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: white;
+  text-decoration: none;
+}
+
+.logo-circle {
+  width: 64px;
+  height: 64px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 5px solid var(--yellow);
+  box-shadow: 0 0 30px rgba(247,200,0,0.7);
+}
+
+.glass-card {
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.7);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(123,45,155,0.2);
+  padding: 32px;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-15px) scale(1.03);
+  box-shadow: 0 35px 80px rgba(123,45,155,0.35);
+}
+
+.section {
+  padding: 90px 20px 80px;
+  position: relative;
+  z-index: 2;
+}
+
+.section-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+h2.section-title {
+  font-size: clamp(2.2rem, 5.8vw, 3.2rem);
+  color: var(--purple-dark);
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: 'Playfair Display', serif;
+}
+
+.section-tag {
+  display: inline-block;
+  background: rgba(123,45,155,0.1);
+  color: var(--purple);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 20px;
+  border-radius: 50px;
+  margin-bottom: 12px;
+}
+
+.scheme-tabs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 40px 0 35px;
+}
+
+.tab-btn {
+  background: rgba(255,255,255,0.9);
+  border: 2px solid transparent;
+  color: var(--purple-dark);
+  padding: 13px 26px;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.35s;
+  font-size: 15px;
+}
+
+.tab-btn.active, .tab-btn:hover {
+  background: var(--yellow);
+  color: var(--purple-dark);
+  border-color: var(--yellow);
+  transform: translateY(-4px);
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.scheme-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  margin-top: 15px;
+}
+
+.scheme-table th {
+  background: var(--red);
+  color: white;
+  padding: 16px 12px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.scheme-table td {
+  padding: 15px 12px;
+  text-align: center;
+  border-bottom: 1px solid #f0e0fa;
+  font-size: 14.5px;
+}
+
+.scheme-table tr:hover {
+  background: #fdf5ff;
+}
+
+.scheme-note {
+  background: rgba(123,45,155,0.08);
+  padding: 18px 22px;
+  border-radius: 16px;
+  margin-bottom: 25px;
+  font-size: 15.5px;
+  color: #444;
+  border-left: 5px solid var(--purple);
+}
+
+.mr { font-family: 'Tiro Devanagari Marathi', serif; line-height: 1.9; }
+
+.floating-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--red);
+  color: white;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  box-shadow: 0 12px 40px rgba(227,6,19,0.5);
+  z-index: 9999;
+  text-decoration: none;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 10px 18px;
+  transition: all 0.3s;
+}
+
+nav a:hover {
+  color: var(--yellow);
+  background: rgba(255,255,255,0.12);
+  border-radius: 12px;
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div id="mouse-glow"></div>
+
+<div class="notice-bar">
+  🎉 घरबसल्या IMPS/RTGS/NEFT + मोबाईल अॅप सुविधा! ग्राहक सेवा: <strong>9404036354</strong>
+</div>
+
+<header>
+  <div class="top-bar">
+    <span>✉️ shreeadarshlokvikas@gmail.com</span>
+    <span>📞 9403044947 | 9404036354 | 9403038950 | 9403038436 | 9403038643</span>
+  </div>
+  <div style="max-width:1280px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;">
+    <a href="index.html" class="logo-wrap">
+      <div class="logo-circle">
+        <svg viewBox="0 0 100 100" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="50" fill="#7B2D9B"/>
+          <polygon points="50,8 59,26 50,22 41,26" fill="#F7941D"/>
+          <polygon points="73,19 73,37 65,31 63,22" fill="#00A651"/>
+          <polygon points="89,43 77,52 73,44 79,36" fill="#00AEEF"/>
+          <polygon points="83,72 69,67 71,59 79,55" fill="#EC008C"/>
+          <polygon points="59,89 53,75 59,71 67,75" fill="#F7C800"/>
+          <polygon points="31,87 35,73 43,75 41,84" fill="#9b2db8"/>
+          <polygon points="13,67 25,59 29,67 23,73" fill="#E30613"/>
+          <circle cx="50" cy="46" r="18" fill="#E30613"/>
+          <text x="50" y="53" text-anchor="middle" font-size="15" fill="white" font-weight="bold">श्री</text>
+          <rect x="34" y="72" width="32" height="11" rx="2" fill="white"/>
+          <text x="50" y="80" text-anchor="middle" font-size="6.5" fill="#333" font-weight="bold">AURANGABAD</text>
+        </svg>
+      </div>
+      <div>
+        <h1 style="font-size:19px;line-height:1;">श्री आदर्श लोकविकास</h1>
+        <p style="font-size:11px;color:var(--yellow);">नागरी सहकारी पतसंस्था मर्या.</p>
+      </div>
+    </a>
+    <nav style="display:flex;gap:20px;flex-wrap:wrap;">
+      <a href="index.html">मुख्यपान</a>
+      <a href="about.html">आमच्याबद्दल</a>
+      <a href="services.html">सेवा</a>
+      <a href="schemes.html">योजना</a>
+      <a href="branches.html">शाखा</a>
+      <a href="contact.html">संपर्क</a>
+    </nav>
+  </div>
+</header>
+
+<section class="section">
+  <div class="section-inner">
+    <div style="text-align:center;">
+      <span class="section-tag">ठेव योजना</span>
+      <h2 class="section-title mr">सर्व योजना – Poster प्रमाणे</h2>
+      <p class="mr" style="max-width:720px;margin:0 auto 30px;font-size:1.2rem;color:#444;">
+        प्रत्येक घरासाठी, घरातील प्रत्येकासाठी...
+      </p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="scheme-tabs">
+      <button class="tab-btn active" onclick="showTab(0)">मासिक प्राप्ती</button>
+      <button class="tab-btn" onclick="showTab(1)">समृद्ध ठेव</button>
+      <button class="tab-btn" onclick="showTab(2)">कन्यादान / शिक्षण</button>
+      <button class="tab-btn" onclick="showTab(3)">साप्ताहिक बचत</button>
+      <button class="tab-btn" onclick="showTab(4)">धनलक्ष्मी</button>
+    </div>
+
+    <!-- 1. मासिक प्राप्ती योजना -->
+    <div id="tab-0" class="tab-pane glass-card">
+      <div class="scheme-note">
+        <strong>श्री आदर्श मासिक प्राप्ती योजना</strong> — ३६ महिने + २% बोनस
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="scheme-table">
+          <thead>
+            <tr>
+              <th>भरावयाची रक्कम रु.</th>
+              <th>३६ महिने मासिक रक्कम</th>
+              <th>बोनस २%</th>
+              <th>एकूण मिळणारी रक्कम</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>५०,०००</td><td>५००</td><td>१,०००</td><td>१९,०००</td></tr>
+            <tr><td>१,००,०००</td><td>१,०००</td><td>२,०००</td><td>३८,०००</td></tr>
+            <tr><td>२,००,०००</td><td>२,०००</td><td>४,०००</td><td>७६,०००</td></tr>
+            <tr><td>३,००,०००</td><td>३,०००</td><td>६,०००</td><td>१,१४,०००</td></tr>
+            <tr><td>४,००,०००</td><td>४,०००</td><td>८,०००</td><td>१,५२,०००</td></tr>
+            <tr><td>५,००,०००</td><td>५,०००</td><td>१०,०००</td><td>१,९०,०००</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2. समृद्ध ठेव योजना -->
+    <div id="tab-1" class="tab-pane glass-card">
+      <div class="scheme-note">
+        <strong>श्री आदर्श समृद्ध ठेव योजना</strong> — मुदतीनुसार वाढता परतावा
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="scheme-table">
+          <thead>
+            <tr>
+              <th>रक्कम रु.</th>
+              <th>१२ महिने</th>
+              <th>२४ महिने</th>
+              <th>३६ महिने</th>
+              <th>४८ महिने</th>
+              <th>६० महिने</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>४०,०००</td><td>४४,४००</td><td>६९,८८०</td><td>६९,३९०</td><td>७८,६८०</td><td>९०,९००</td></tr>
+            <tr><td>१,००,०००</td><td>१,११,०००</td><td>१,२३,९९०</td><td>१,३६,९६०</td><td>१,५१,७००</td><td>१,६८,४००</td></tr>
+            <tr><td>२,००,०००</td><td>२,२२,०००</td><td>२,४७,९८०</td><td>२,७३,९२०</td><td>३,०३,४००</td><td>३,३६,८००</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. कन्यादान / शिक्षण ठेव योजना -->
+    <div id="tab-2" class="tab-pane glass-card">
+      <div class="scheme-note">
+        <strong>श्री आदर्श कन्यादान / शिक्षण ठेव योजना</strong> — १८ व्या वर्षी ₹५,००,०००
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="scheme-table">
+          <thead>
+            <tr>
+              <th>मुलाचे वय</th>
+              <th>प्रति महिना रु.</th>
+              <th>भरावयाचे महिने</th>
+              <th>१८ व्या वर्षी मिळणारी रक्कम</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>१</td><td>१,१६०</td><td>२०४</td><td>५,००,०००</td></tr>
+            <tr><td>२</td><td>१,३००</td><td>१९२</td><td>५,००,०००</td></tr>
+            <tr><td>३</td><td>१,४५०</td><td>१८०</td><td>५,००,०००</td></tr>
+            <tr><td>४</td><td>१,६३०</td><td>१६८</td><td>५,००,०००</td></tr>
+            <tr><td>५</td><td>१,८४०</td><td>१५६</td><td>५,००,०००</td></tr>
+            <tr><td>६</td><td>२,०९०</td><td>१४४</td><td>५,००,०००</td></tr>
+            <tr><td>७</td><td>२,३८०</td><td>१३२</td><td>५,००,०००</td></tr>
+            <tr><td>८</td><td>२,७४०</td><td>१२०</td><td>५,००,०००</td></tr>
+            <tr><td>९</td><td>३,१९०</td><td>१०८</td><td>५,००,०००</td></tr>
+            <tr><td>१०</td><td>३,७४०</td><td>९६</td><td>५,००,०००</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 4. साप्ताहिक बचत योजना -->
+    <div id="tab-3" class="tab-pane glass-card">
+      <div class="scheme-note">
+        <strong>श्री आदर्श साप्ताहिक बचत योजना</strong> — ६ महिने @ ९% | १२ महिने @ ६%
+      </div>
+      <p style="font-size:15.5px;color:#333;margin-top:20px;">साप्ताहिक छोट्या हप्त्यात मोठी रक्कम जमा करा आणि चांगला परतावा मिळवा.</p>
+    </div>
+
+    <!-- 5. धनलक्ष्मी ठेव योजना -->
+    <div id="tab-4" class="tab-pane glass-card">
+      <div class="scheme-note">
+        <strong>श्री आदर्श धनलक्ष्मी ठेव योजना</strong> — मासिक हप्त्यात ४ वर्षांत संपत्ती वाढवा
+      </div>
+      <p style="font-size:15.5px;color:#333;margin-top:20px;">मासिक बचत करून दीर्घकालीन आर्थिक सुरक्षा मिळवा.</p>
+    </div>
+  </div>
+</section>
+
+<a href="tel:9404036354" class="floating-btn">📞</a>
+
+<footer style="background:#1a0a26;color:#aaa;padding:60px 20px;text-align:center;position:relative;z-index:2;">
+  © 2025 श्री आदर्श लोकविकास | छत्रपती संभाजीनगर (औरंगाबाद), महाराष्ट्र
+</footer>
+
+<script>
+// Moving Background + Mouse Glow
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+const mouseGlow = document.getElementById('mouse-glow');
+let width, height, particles = [];
+const particleCount = 90;
+
+class Particle {
+  constructor() {
+    this.x = Math.random() * width;
+    this.y = Math.random() * height;
+    this.size = Math.random() * 3.2 + 1;
+    this.speedX = Math.random() * 0.5 - 0.25;
+    this.speedY = Math.random() * 0.5 - 0.25;
+    this.opacity = Math.random() * 0.7 + 0.25;
+  }
+  update() { 
+    this.x += this.speedX; 
+    this.y += this.speedY;
+    if (this.x < 0 || this.x > width) this.speedX *= -1;
+    if (this.y < 0 || this.y > height) this.speedY *= -1;
+  }
+  draw() {
+    ctx.fillStyle = `rgba(247,200,0,${this.opacity})`;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+    ctx.fill();
+  }
+}
+
+function resize() {
+  width = window.innerWidth;
+  height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+}
+
+function animate() {
+  ctx.clearRect(0, 0, width, height);
+  ctx.strokeStyle = 'rgba(123,45,155,0.1)';
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i+1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 150) {
+        ctx.globalAlpha = (150 - dist)/150 * 0.2;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.globalAlpha = 1;
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animate);
+}
+
+function showTab(n) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Initialize
+window.addEventListener('resize', () => {
+  resize();
+  particles = [];
+  for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+});
+
+document.addEventListener('mousemove', (e) => {
+  mouseGlow.style.left = e.clientX + 'px';
+  mouseGlow.style.top = e.clientY + 'px';
+  mouseGlow.style.opacity = '0.8';
+});
+
+document.addEventListener('mouseleave', () => mouseGlow.style.opacity = '0');
+
+resize();
+for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+animate();
+</script>
+</body>
+</html>

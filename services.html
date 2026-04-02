@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>सेवा - श्री आदर्श लोकविकास</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Marathi:ital@0;1&family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple: #7B2D9B;
+  --purple-dark: #4a1564;
+  --red: #E30613;
+  --yellow: #F7C800;
+  --text: #1a0a26;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  position: relative;
+  overflow-x: hidden;
+  min-height: 100vh;
+  background: #FAF7FD;
+}
+
+/* Best AI-style Moving Background */
+#bg-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Mouse Following Glow */
+#mouse-glow {
+  position: fixed;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(247,200,0,0.22) 0%, transparent 65%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.25s ease;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.notice-bar {
+  background: var(--yellow);
+  padding: 11px 20px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--purple-dark);
+  font-size: 14.5px;
+  position: relative;
+  z-index: 10;
+}
+
+header {
+  background: var(--purple-dark);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.35);
+}
+
+.top-bar {
+  background: #5f1a80;
+  padding: 9px 20px;
+  font-size: 13px;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: white;
+  text-decoration: none;
+}
+
+.logo-circle {
+  width: 64px;
+  height: 64px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 5px solid var(--yellow);
+  box-shadow: 0 0 30px rgba(247,200,0,0.65);
+}
+
+.glass-card {
+  background: rgba(255,255,255,0.93);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 24px;
+  box-shadow: 0 15px 55px rgba(123,45,155,0.18);
+  padding: 32px 28px;
+  transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+}
+
+.glass-card:hover {
+  transform: translateY(-18px) scale(1.04);
+  box-shadow: 0 30px 70px rgba(123,45,155,0.32);
+  border-color: var(--yellow);
+}
+
+.service-icon {
+  font-size: 42px;
+  margin-bottom: 18px;
+  display: block;
+  transition: transform 0.4s;
+}
+
+.glass-card:hover .service-icon {
+  transform: scale(1.15) rotate(8deg);
+}
+
+.section {
+  padding: 90px 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.section-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+h2.section-title {
+  font-size: clamp(2.1rem, 5.5vw, 3rem);
+  color: var(--purple-dark);
+  text-align: center;
+  margin-bottom: 50px;
+  font-family: 'Playfair Display', serif;
+  position: relative;
+}
+
+h2.section-title:after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(to right, var(--yellow), var(--purple));
+  border-radius: 3px;
+}
+
+.mr { font-family: 'Tiro Devanagari Marathi', serif; line-height: 1.85; }
+
+/* Navigation */
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 10px 18px;
+  transition: all 0.3s;
+}
+
+nav a:hover {
+  color: var(--yellow);
+  background: rgba(255,255,255,0.12);
+  border-radius: 12px;
+}
+
+.floating-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--red);
+  color: white;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  box-shadow: 0 12px 40px rgba(227,6,19,0.5);
+  z-index: 9999;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.floating-btn:hover {
+  transform: scale(1.18) rotate(10deg);
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div id="mouse-glow"></div>
+
+<div class="notice-bar">
+  🎉 आता घरबसल्या IMPS/RTGS/NEFT + मोबाईल अॅप सुविधा! ग्राहक सेवा: <strong>9404036354</strong>
+</div>
+
+<header>
+  <div class="top-bar">
+    <span>✉️ shreeadarshlokvikas@gmail.com</span>
+    <span>📞 9403044947 | 9404036354 | 9403038950 | 9403038436 | 9403038643</span>
+  </div>
+  <div style="max-width:1280px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;">
+    <a href="index.html" class="logo-wrap">
+      <div class="logo-circle">
+        <svg viewBox="0 0 100 100" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="50" fill="#7B2D9B"/>
+          <polygon points="50,8 59,26 50,22 41,26" fill="#F7941D"/>
+          <polygon points="73,19 73,37 65,31 63,22" fill="#00A651"/>
+          <polygon points="89,43 77,52 73,44 79,36" fill="#00AEEF"/>
+          <polygon points="83,72 69,67 71,59 79,55" fill="#EC008C"/>
+          <polygon points="59,89 53,75 59,71 67,75" fill="#F7C800"/>
+          <polygon points="31,87 35,73 43,75 41,84" fill="#9b2db8"/>
+          <polygon points="13,67 25,59 29,67 23,73" fill="#E30613"/>
+          <circle cx="50" cy="46" r="18" fill="#E30613"/>
+          <text x="50" y="53" text-anchor="middle" font-size="15" fill="white" font-weight="bold">श्री</text>
+          <rect x="34" y="72" width="32" height="11" rx="2" fill="white"/>
+          <text x="50" y="80" text-anchor="middle" font-size="6.5" fill="#333" font-weight="bold">AURANGABAD</text>
+        </svg>
+      </div>
+      <div>
+        <h1 style="font-size:19px;line-height:1;">श्री आदर्श लोकविकास</h1>
+        <p style="font-size:11px;color:var(--yellow);">नागरी सहकारी पतसंस्था मर्या.</p>
+      </div>
+    </a>
+    <nav style="display:flex;gap:20px;flex-wrap:wrap;">
+      <a href="index.html">मुख्यपान</a>
+      <a href="about.html">आमच्याबद्दल</a>
+      <a href="services.html">सेवा</a>
+      <a href="schemes.html">योजना</a>
+      <a href="branches.html">शाखा</a>
+      <a href="contact.html">संपर्क</a>
+    </nav>
+  </div>
+</header>
+
+<section class="section">
+  <div class="section-inner">
+    <h2 class="section-title mr">आकर्षक कर्ज योजना</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;">
+      <div class="glass-card">
+        <span class="service-icon">🏦</span>
+        <h3 style="color:var(--purple-dark);margin-bottom:12px;">मुदत ठेव तारण कर्ज</h3>
+        <p>आपल्या मुदत ठेवीवर आकर्षक व्याजदराने तात्काळ कर्ज उपलब्ध</p>
+      </div>
+      <div class="glass-card">
+        <span class="service-icon">🏠</span>
+        <h3 style="color:var(--purple-dark);margin-bottom:12px;">स्थावर मालमत्ता तारण कर्ज</h3>
+        <p>घर, प्लॉट किंवा मालमत्तेवर विश्वासार्ह कर्ज सुविधा</p>
+      </div>
+      <div class="glass-card">
+        <span class="service-icon">💍</span>
+        <h3 style="color:var(--purple-dark);margin-bottom:12px;">सोने-चांदी तारण कर्ज</h3>
+        <p>सोने-चांदी जडतेवर कमी व्याजदरात त्वरित कर्ज</p>
+      </div>
+      <div class="glass-card">
+        <span class="service-icon">⚡</span>
+        <h3 style="color:var(--purple-dark);margin-bottom:12px;">गरजवंताना तात्काळ कर्ज</h3>
+        <p>आपत्कालीन गरजांसाठी वेगवान आणि सोपी कर्ज प्रक्रिया</p>
+      </div>
+    </div>
+
+    <h2 class="section-title mr" style="margin-top:80px;">ठेव योजना</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;">
+      <div class="glass-card">
+        <span class="service-icon">💰</span>
+        <h3 style="color:var(--purple-dark);margin-bottom:12px;">बचत ठेव योजना</h3>
+        <p>दररोज बचत करा आणि उत्तम व्याज मिळवा</p>
+      </div>
+      <div class="glass-card">
+        <span class="service-icon">📅</span>
+        <h3 style="color:var(--purple-dark);margin-bottom:12px;">मुदत ठेव योजना</h3>
+        <p>निश्चित मुदतीसाठी उच्च व्याजदर</p>
+      </div>
+      <div class="glass-card">
+        <span class="service-icon">🌟</span>
+        <h3 style="color:var(--purple-dark);margin-bottom:12px;">श्री आदर्श संचय ठेव योजना</h3>
+        <p>दीर्घकालीन गुंतवणुकीसाठी विशेष योजना</p>
+      </div>
+      <div class="glass-card">
+        <span class="service-icon">🌳</span>
+        <h3 style="color:var(--purple-dark);margin-bottom:12px;">श्री आदर्श कल्पवृक्ष ठेव योजना</h3>
+        <p>आपल्या स्वप्नांसाठी कल्पवृक्षासारखी योजना</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<a href="tel:9404036354" class="floating-btn">📞</a>
+
+<footer style="background:#1a0a26;color:#aaa;padding:55px 20px;text-align:center;position:relative;z-index:2;">
+  © 2025 श्री आदर्श लोकविकास | छत्रपती संभाजीनगर (औरंगाबाद), महाराष्ट्र
+</footer>
+
+<script>
+// AI-style Moving Background + Mouse Glow
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+const mouseGlow = document.getElementById('mouse-glow');
+
+let width, height;
+let particles = [];
+const particleCount = 85;
+
+class Particle {
+  constructor() {
+    this.x = Math.random() * width;
+    this.y = Math.random() * height;
+    this.size = Math.random() * 3.5 + 1.2;
+    this.speedX = Math.random() * 0.6 - 0.3;
+    this.speedY = Math.random() * 0.6 - 0.3;
+    this.opacity = Math.random() * 0.65 + 0.25;
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    if (this.x < 0 || this.x > width) this.speedX *= -1;
+    if (this.y < 0 || this.y > height) this.speedY *= -1;
+  }
+  draw() {
+    ctx.fillStyle = `rgba(247, 200, 0, ${this.opacity})`;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function resize() {
+  width = window.innerWidth;
+  height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+}
+
+function animate() {
+  ctx.clearRect(0, 0, width, height);
+  
+  // Soft connecting lines
+  ctx.strokeStyle = 'rgba(123, 45, 155, 0.09)';
+  ctx.lineWidth = 1.2;
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const distance = Math.sqrt(dx*dx + dy*dy);
+      if (distance < 145) {
+        ctx.globalAlpha = (145 - distance) / 145 * 0.18;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.globalAlpha = 1;
+
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+
+  requestAnimationFrame(animate);
+}
+
+window.addEventListener('resize', () => {
+  resize();
+  particles = [];
+  for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+});
+
+document.addEventListener('mousemove', (e) => {
+  mouseGlow.style.left = `${e.clientX}px`;
+  mouseGlow.style.top = `${e.clientY}px`;
+  mouseGlow.style.opacity = '0.75';
+});
+
+document.addEventListener('mouseleave', () => {
+  mouseGlow.style.opacity = '0';
+});
+
+// Initialize
+resize();
+for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+animate();
+</script>
+</body>
+</html>

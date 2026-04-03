@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — श्री आदर्श लोकविकास</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Marathi&display=swap" rel="stylesheet">
+<style>
+:root{
+  --purple:#7B2D9B;--purple-dark:#4a1564;--purple-mid:#5f1a80;
+  --red:#E30613;--yellow:#F7C800;--green:#00A651;--orange:#F7941D;
+  --white:#fff;--bg:#F4F0F8;--card:#fff;
+  --text:#1a0a26;--muted:#6b5b7b;--border:rgba(107,35,142,0.13);
+  --radius:12px;--sidebar:240px;
+  --success:#e8faf0;--success-text:#0a6e34;
+  --danger:#fde8e8;--danger-text:#9b0000;
+  --info:#eef4ff;--info-text:#1a4db3;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* LOGIN */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--purple-dark),var(--purple));}
+.login-box{background:white;border-radius:18px;padding:40px 36px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.25);}
+.login-logo{text-align:center;margin-bottom:28px;}
+.login-logo-circle{width:68px;height:68px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;border:3px solid var(--yellow);}
+.login-logo-circle svg{width:60px;height:60px;}
+.login-logo h2{font-size:17px;color:var(--purple-dark);line-height:1.3;}
+.login-logo p{font-size:12px;color:var(--muted);margin-top:3px;}
+.login-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.login-field label{font-size:12.5px;font-weight:500;color:var(--muted);}
+.login-field input{border:1.5px solid var(--border);border-radius:9px;padding:11px 13px;font-size:14.5px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;color:var(--text);}
+.login-field input:focus{border-color:var(--purple);}
+.login-btn{width:100%;background:var(--purple);color:white;border:none;border-radius:9px;padding:13px;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px;transition:background .2s;}
+.login-btn:hover{background:var(--purple-dark);}
+.login-err{background:var(--danger);color:var(--danger-text);border-radius:8px;padding:9px 13px;font-size:13px;margin-top:10px;display:none;}
+.login-err.show{display:block;}
+
+/* LAYOUT */
+.app{display:none;min-height:100vh;}
+.app.show{display:flex;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--purple-dark);flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-brand{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.1);}
+.sidebar-brand h1{font-size:14px;color:white;line-height:1.4;font-family:'Tiro Devanagari Marathi',serif;}
+.sidebar-brand p{font-size:11px;color:rgba(255,255,255,.45);margin-top:2px;}
+.sidebar-nav{flex:1;padding:12px 0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 18px;color:rgba(255,255,255,.7);cursor:pointer;font-size:13.5px;font-weight:500;transition:all .18s;border-left:3px solid transparent;}
+.nav-item:hover{background:rgba(255,255,255,.08);color:white;}
+.nav-item.active{background:rgba(255,255,255,.13);color:white;border-left-color:var(--yellow);}
+.nav-item .ni{font-size:16px;width:20px;flex-shrink:0;}
+.sidebar-foot{padding:14px 18px;border-top:1px solid rgba(255,255,255,.1);}
+.logout-btn{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.55);cursor:pointer;font-size:13px;transition:color .18s;}
+.logout-btn:hover{color:var(--yellow);}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{background:white;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.topbar h2{font-size:17px;font-weight:600;color:var(--purple-dark);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.admin-badge{background:rgba(107,35,142,.1);color:var(--purple);font-size:12px;font-weight:600;padding:5px 12px;border-radius:100px;}
+.content{flex:1;padding:28px;overflow-y:auto;}
+
+/* PAGES */
+.page{display:none;}
+.page.active{display:block;}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:28px;}
+.stat-card{background:white;border-radius:var(--radius);padding:18px 16px;border:1px solid var(--border);}
+.stat-card .label{font-size:12px;color:var(--muted);margin-bottom:6px;}
+.stat-card .value{font-size:1.6rem;font-weight:700;color:var(--purple);line-height:1;}
+.stat-card .sub{font-size:11.5px;color:var(--muted);margin-top:4px;}
+
+/* SECTION CARD */
+.sec-card{background:white;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:20px;}
+.sec-card-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.sec-card-hdr h3{font-size:15px;font-weight:600;color:var(--purple-dark);}
+.sec-card-body{padding:20px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .18s;}
+.btn-purple{background:var(--purple);color:white;}
+.btn-purple:hover{background:var(--purple-dark);}
+.btn-outline{background:transparent;color:var(--purple);border:1.5px solid var(--border);}
+.btn-outline:hover{border-color:var(--purple);background:rgba(107,35,142,.05);}
+.btn-red{background:var(--red);color:white;}
+.btn-red:hover{background:#c0040f;}
+.btn-green{background:var(--green);color:white;}
+.btn-sm{padding:5px 11px;font-size:12px;}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.data-table thead th{background:var(--bg);padding:10px 13px;text-align:left;font-size:12px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;}
+.data-table tbody td{padding:11px 13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.data-table tbody tr:last-child td{border-bottom:none;}
+.data-table tbody tr:hover{background:#faf5ff;}
+.table-wrap{overflow-x:auto;}
+
+/* BADGE */
+.badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11.5px;font-weight:600;}
+.badge-new{background:#eef4ff;color:#1a4db3;}
+.badge-read{background:#e8faf0;color:#0a6e34;}
+.badge-pending{background:#fff8e1;color:#7a5f00;}
+.badge-active{background:#e8faf0;color:#0a6e34;}
+.badge-inactive{background:#fde8e8;color:#9b0000;}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group label{font-size:12.5px;font-weight:500;color:var(--muted);}
+.form-group input,.form-group select,.form-group textarea{border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--bg);outline:none;transition:border-color .2s;width:100%;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--purple);background:white;}
+.form-group textarea{resize:vertical;min-height:80px;}
+.form-group.full{grid-column:1/-1;}
+.form-actions{display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#1a0a26;color:white;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:#0a6e34;}
+.toast.error{background:#9b0000;}
+
+/* NOTICE EDITOR */
+.notice-list{display:flex;flex-direction:column;gap:10px;}
+.notice-item{background:var(--bg);border-radius:10px;padding:14px 16px;border:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;}
+.notice-item .notice-content{flex:1;}
+.notice-item .notice-text{font-size:14px;color:var(--text);line-height:1.55;margin-bottom:4px;}
+.notice-item .notice-meta{font-size:11.5px;color:var(--muted);}
+.notice-item .notice-actions{display:flex;gap:6px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-circle">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="50" fill="#7B2D9B"/>
+          <polygon points="50,8 59,26 50,22 41,26" fill="#F7941D"/>
+          <polygon points="73,19 73,37 65,31 63,22" fill="#00A651"/>
+          <polygon points="89,43 77,52 73,44 79,36" fill="#00AEEF"/>
+          <polygon points="83,72 69,67 71,59 79,55" fill="#EC008C"/>
+          <polygon points="59,89 53,75 59,71 67,75" fill="#F7C800"/>
+          <polygon points="13,67 25,59 29,67 23,73" fill="#E30613"/>
+          <ellipse cx="36" cy="70" rx="10" ry="13" fill="#FDBCAA" transform="rotate(-10,36,70)"/>
+          <ellipse cx="64" cy="70" rx="10" ry="13" fill="#FDBCAA" transform="rotate(10,64,70)"/>
+          <circle cx="50" cy="46" r="18" fill="#E30613"/>
+          <circle cx="50" cy="46" r="16" fill="none" stroke="white" stroke-width="1.5"/>
+          <text x="50" y="53" text-anchor="middle" font-size="15" fill="white" font-family="serif" font-weight="bold">श्री</text>
+          <rect x="34" y="72" width="32" height="11" rx="2" fill="white"/>
+          <text x="50" y="80" text-anchor="middle" font-size="6.5" fill="#333" font-family="sans-serif" font-weight="bold">AURANGABAD</text>
+        </svg>
+      </div>
+      <h2>श्री आदर्श लोकविकास</h2>
+      <p>Admin Panel — Secure Login</p>
+    </div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="Enter username" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Login to Admin Panel</button>
+    <div class="login-err" id="loginErr">❌ Invalid username or password.</div>
+    <p style="font-size:11.5px;color:var(--muted);text-align:center;margin-top:16px;">Default: admin / Adarsh2026</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <h1>श्री आदर्श लोकविकास</h1>
+      <p>Admin Dashboard</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" onclick="goTo('dashboard')"><span class="ni">📊</span> Dashboard</div>
+      <div class="nav-item" onclick="goTo('submissions')"><span class="ni">📨</span> Enquiries</div>
+      <div class="nav-item" onclick="goTo('schemes')"><span class="ni">📋</span> Schemes</div>
+      <div class="nav-item" onclick="goTo('branches')"><span class="ni">📍</span> Branches</div>
+      <div class="nav-item" onclick="goTo('notices')"><span class="ni">📢</span> Notices</div>
+      <div class="nav-item" onclick="goTo('members')"><span class="ni">👥</span> Members</div>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="logout-btn" onclick="doLogout()">
+        <span style="font-size:16px;">🚪</span> Logout
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="ham-mobile" onclick="document.getElementById('sidebar').classList.toggle('open')">
+          <span></span><span></span><span></span>
+        </button>
+        <h2 id="pageTitle">Dashboard</h2>
+      </div>
+      <div class="topbar-right">
+        <span class="admin-badge" id="adminName">👤 admin</span>
+        <a href="https://aniket466.github.io/shree-adarsh-lokvikas/" target="_blank" class="btn btn-outline btn-sm">🌐 View Live Site</a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-row">
+          <div class="stat-card"><div class="label">Total Enquiries</div><div class="value" id="stat-enq">0</div></div>
+          <div class="stat-card"><div class="label">New (Unread)</div><div class="value" id="stat-new">0</div></div>
+          <div class="stat-card"><div class="label">Active Members</div><div class="value" id="stat-mem">0</div></div>
+          <div class="stat-card"><div class="label">Active Notices</div><div class="value" id="stat-not">0</div></div>
+          <div class="stat-card"><div class="label">Branches</div><div class="value">5</div></div>
+        </div>
+
+        <div class="sec-card">
+          <div class="sec-card-hdr"><h3>📨 Recent Enquiries</h3></div>
+          <div class="sec-card-body table-wrap">
+            <table class="data-table" id="dash-enq-table">
+              <thead><tr><th>Name</th><th>Mobile</th><th>Subject</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="dash-enq-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Other pages (schemes, branches, notices, members) are kept simple for now -->
+      <div class="page" id="page-schemes"><p style="text-align:center;padding:40px;color:var(--muted);">Scheme Management Coming Soon...</p></div>
+      <div class="page" id="page-branches"><p style="text-align:center;padding:40px;color:var(--muted);">Branch Management Coming Soon...</p></div>
+      <div class="page" id="page-notices"><p style="text-align:center;padding:40px;color:var(--muted);">Notices Management Coming Soon...</p></div>
+      <div class="page" id="page-members"><p style="text-align:center;padding:40px;color:var(--muted);">Member Management Coming Soon...</p></div>
+      <div class="page" id="page-submissions"><p style="text-align:center;padding:40px;color:var(--muted);">Enquiries Management Coming Soon...</p></div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ================== CHANGE USERNAME & PASSWORD HERE ==================
+var ADMINS = {
+  "admin": "Adarsh2026",        // ← Change password here
+  "aniket": "aniket466"         // ← You can add your own username
